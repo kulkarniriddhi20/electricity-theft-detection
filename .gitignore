@@ -1,5 +1,14 @@
+# Virtual environment
 venv/
+
+# Python cache
 __pycache__/
+*.pyc
+
+# Data files (do NOT upload datasets)
 data/raw/
 data/processed/
 *.csv
+
+# OS files
+.DS_Store
