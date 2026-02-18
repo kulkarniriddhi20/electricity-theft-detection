@@ -1,63 +1,80 @@
 import pandas as pd
 import numpy as np
 
-# Load labeled data
-data = pd.read_csv("data/processed/final_data.csv")
+# --------------------------------------------------
+# Load cleaned data
+# --------------------------------------------------
+data = pd.read_csv("data/processed/clean_data.csv")
 
-# Convert datetime
+# Convert datetime column
 data['datetime'] = pd.to_datetime(data['datetime'])
 
-# Create date and hour columns
-data['date'] = data['datetime'].dt.date
+# Sort data
+data = data.sort_values(['customer_id', 'datetime'])
+
+# --------------------------------------------------
+# Feature 1: Average Daily Consumption
+# --------------------------------------------------
+data['daily_mean'] = data.groupby('customer_id')['consumption'].transform('mean')
+
+# --------------------------------------------------
+# Feature 2: Night Usage Ratio (12 AM – 5 AM)
+# --------------------------------------------------
 data['hour'] = data['datetime'].dt.hour
-data['weekday'] = data['datetime'].dt.weekday
 
-# -------------------------------
-# 1️⃣ Daily Mean Consumption
-# -------------------------------
-data['daily_mean'] = data.groupby(['customer_id', 'date'])['consumption'].transform('mean')
+night_usage = data[data['hour'].between(0, 5)].groupby('customer_id')['consumption'].sum()
+total_usage = data.groupby('customer_id')['consumption'].sum()
 
-# -------------------------------
-# 2️⃣ Daily Variance
-# -------------------------------
-data['daily_variance'] = data.groupby(['customer_id', 'date'])['consumption'].transform('var')
+data['night_ratio'] = data['customer_id'].map(night_usage / total_usage)
+data['night_ratio'] = data['night_ratio'].fillna(0)
 
-# -------------------------------
-# 3️⃣ Night Consumption Ratio
-# Night = 10 PM to 6 AM
-# -------------------------------
-night_data = data[(data['hour'] >= 22) | (data['hour'] <= 6)]
-night_sum = night_data.groupby(['customer_id', 'date'])['consumption'].sum()
+# --------------------------------------------------
+# Feature 3: Weekend Usage Ratio
+# --------------------------------------------------
+data['day'] = data['datetime'].dt.dayofweek  # 5 & 6 = Weekend
 
-total_sum = data.groupby(['customer_id', 'date'])['consumption'].sum()
+weekend_usage = data[data['day'] >= 5].groupby('customer_id')['consumption'].sum()
+data['weekend_ratio'] = data['customer_id'].map(weekend_usage / total_usage)
+data['weekend_ratio'] = data['weekend_ratio'].fillna(0)
 
-data['night_ratio'] = data.set_index(['customer_id', 'date']).index.map(
-    (night_sum / total_sum).fillna(0)
-)
+# --------------------------------------------------
+# Feature 4: Consumption Variance
+# --------------------------------------------------
+data['variance'] = data.groupby('customer_id')['consumption'].transform('var')
+data['variance'] = data['variance'].fillna(0)
 
-# -------------------------------
-# 4️⃣ Weekend Consumption Ratio
-# -------------------------------
-weekend_data = data[data['weekday'] >= 5]
-weekend_sum = weekend_data.groupby(['customer_id', 'date'])['consumption'].sum()
-
-data['weekend_ratio'] = data.set_index(['customer_id', 'date']).index.map(
-    (weekend_sum / total_sum).fillna(0)
-)
-
-# -------------------------------
-# 5️⃣ Sudden Drop Feature
-# -------------------------------
+# --------------------------------------------------
+# Feature 5: Sudden Drop in Consumption
+# --------------------------------------------------
 data['prev_consumption'] = data.groupby('customer_id')['consumption'].shift(1)
 
-data['sudden_drop'] = (data['prev_consumption'] - data['consumption']) / data['prev_consumption']
+data['sudden_drop'] = (
+    (data['prev_consumption'] - data['consumption']) /
+    data['prev_consumption']
+)
+
 data['sudden_drop'] = data['sudden_drop'].fillna(0)
+data['sudden_drop'] = data['sudden_drop'].clip(lower=0)
+
+# --------------------------------------------------
+# Create Final Feature Dataset
+# --------------------------------------------------
+features = data[
+    [
+        'customer_id',
+        'daily_mean',
+        'night_ratio',
+        'weekend_ratio',
+        'variance',
+        'sudden_drop'
+    ]
+]
+
+# Remove duplicate rows per customer
+features = features.drop_duplicates()
 
 # Save features
-features = data[['customer_id', 'date', 'daily_mean', 'daily_variance',
-                 'night_ratio', 'weekend_ratio', 'sudden_drop', 'label']]
-
 features.to_csv("data/processed/features.csv", index=False)
 
-print("✅ Feature engineering completed")
-print(features.head())
+print("✅ STEP 5 COMPLETED: Feature engineering successful")
+print("📁 Saved file: data/processed/features.csv")
