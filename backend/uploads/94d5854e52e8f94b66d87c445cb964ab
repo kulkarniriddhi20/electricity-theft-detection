@@ -1,0 +1,5 @@
+customer_id,daily_mean,night_ratio,weekend_ratio,variance,sudden_drop,load_factor
+1001,15.2,0.05,0.12,2.3,0.01,0.8
+1002,10.5,0.08,0.1,1.5,0.02,0.6
+1003,20.1,0.03,0.15,3.0,0.0,0.9
+2001,5,0.9,0.8,10,0.9,0.2

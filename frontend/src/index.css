@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Fade-in animation (already added) */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+/* Grow animation */
+@keyframes grow {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-grow {
+  animation: grow 1.2s ease-out forwards;
+}
+
+/* Shimmer effect for paragraph text */
+/* Shimmer effect for paragraph text in black */
+@keyframes shimmer-black {
+  0% { background-position: -500px 0; }
+  100% { background-position: 500px 0; }
+}
+
+.animate-shimmer {
+  display: inline-block;
+  background: linear-gradient(
+    90deg,
+    #000000 25%,   /* black start */
+    #333333 50%,   /* slightly lighter black in middle for shimmer effect */
+    #000000 75%
+  );
+  background-size: 1000px 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-black 3s linear infinite;
+}
+/* Dashboard grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
