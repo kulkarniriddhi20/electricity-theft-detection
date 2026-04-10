@@ -10,30 +10,40 @@ export default function Upload() {
   const navigate = useNavigate();
 
   const handlePredict = async () => {
-  if (!file) return alert("Upload file first!");
+    if (!file) return alert("Upload file first!");
 
-  const formData = new FormData();
-  formData.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-  try {
-    const res = await axios.post("http://localhost:5000/predict", formData);
-    navigate("/analytics", { state: res.data });
-  } catch (err) {
-    alert("❌ Backend not running or error occurred");
-    console.error(err);
-  }
-};
+    try {
+      setLoading(true); // ✅ START loading
+
+      const res = await axios.post("http://localhost:5000/predict", formData);
+
+      // Save data
+      localStorage.setItem("customerData", JSON.stringify(res.data));
+
+      setLoading(false); // ✅ STOP loading
+
+      navigate("/analytics", { state: res.data });
+
+    } catch (err) {
+      setLoading(false); // ✅ STOP even if error
+      alert("❌ Backend not running or error occurred");
+      console.error(err);
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-black to-gray-900 text-white flex flex-col items-center justify-center">
 
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.8 }}
         animate={{ scale: 1 }}
         className="bg-white/10 p-10 rounded-2xl backdrop-blur-lg shadow-lg"
       >
         <h1 className="text-2xl mb-5">📤 Upload Customer Data</h1>
 
-        <input 
+        <input
           type="file"
           onChange={(e) => setFile(e.target.files[0])}
           className="mb-4"
@@ -41,10 +51,19 @@ export default function Upload() {
 
         <button
           onClick={handlePredict}
-          className="bg-green-500 px-6 py-2 rounded-xl hover:scale-105 transition"
+          disabled={loading}
+          className={`px-6 py-2 rounded-xl transition ${loading
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-green-500 hover:scale-105"
+            }`}
         >
-          {loading ? "Processing..." : "🚀 Predict"}
+          {loading ? "⏳ Predicting..." : "🚀 Predict"}
         </button>
+        {loading && (
+          <div className="mt-4 flex justify-center">
+            <div className="w-8 h-8 border-4 border-green-400 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
       </motion.div>
     </div>
   );

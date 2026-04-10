@@ -23,10 +23,47 @@ export default function Analytics() {
     { name: "Theft", value: theft }
   ];
 
+  // ✅ 📥 DOWNLOAD FUNCTION (ADD HERE)
+  const downloadCSV = () => {
+
+    if (!data.length) {
+      alert("No data available");
+      return;
+    }
+
+    const headers = ["customer_id", "prediction", "probability"];
+
+    const rows = data.map(d =>
+      [d.customer_id, d.prediction, d.probability].join(",")
+    );
+
+    const csvContent =
+      headers.join(",") + "\n" + rows.join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "prediction_report.csv";
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="p-10 bg-gradient-to-br from-black to-gray-900 text-white min-h-screen">
 
       <h1 className="text-3xl mb-6">📊 Dashboard</h1>
+
+      {/* ✅ DOWNLOAD BUTTON */}
+      <button
+        onClick={downloadCSV}
+        className="bg-blue-600 px-4 py-2 rounded mb-6 hover:bg-blue-700"
+      >
+        ⬇ Download Report
+      </button>
 
       {/* 🔥 CARDS */}
       <div className="grid grid-cols-4 gap-6 mb-8">
@@ -50,7 +87,6 @@ export default function Analytics() {
       {/* 🔥 CHARTS */}
       <div className="grid grid-cols-2 gap-8">
 
-        {/* BAR */}
         <div className="bg-white/10 p-6 rounded-xl">
           <h2>Theft Distribution</h2>
 
@@ -62,7 +98,6 @@ export default function Analytics() {
           </BarChart>
         </div>
 
-        {/* PIE */}
         <div className="bg-white/10 p-6 rounded-xl">
           <h2>Ratio</h2>
 

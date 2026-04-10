@@ -1,5 +1,0 @@
-customer_id,daily_mean,night_ratio,weekend_ratio,variance,sudden_drop,load_factor,theft_probability,prediction
-1001,15.2,0.05,0.12,2.3,0.01,0.8,0.00015828734,0
-1002,10.5,0.08,0.1,1.5,0.02,0.6,0.00015828734,0
-1003,20.1,0.03,0.15,3.0,0.0,0.9,0.00015828734,0
-2001,5.0,0.9,0.8,10.0,0.9,0.2,0.99998534,1

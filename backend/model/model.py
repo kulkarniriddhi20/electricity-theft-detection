@@ -26,12 +26,21 @@ pred = model.predict(X)
 prob = model.predict_proba(X)[:, 1]
 
 # Prepare JSON output
+
 result = []
 for i in range(len(df)):
+    row = df.iloc[i]
+
     result.append({
-        "customer_id": int(df.iloc[i]["customer_id"]) if "customer_id" in df.columns else i+1,
+        "customer_id": int(row["customer_id"]) if "customer_id" in df.columns else i+1,
         "prediction": int(pred[i]),
-        "probability": float(prob[i])
+        "probability": float(prob[i]),
+
+        # 👇 ADD THESE (for graph)
+        "daily_mean": float(row["daily_mean"]) if "daily_mean" in df.columns else 0,
+        "night_ratio": float(row["night_ratio"]) if "night_ratio" in df.columns else 0,
+        "weekend_ratio": float(row["weekend_ratio"]) if "weekend_ratio" in df.columns else 0,
+        "variance": float(row["variance"]) if "variance" in df.columns else 0
     })
 
 # Print JSON for Node.js to read

@@ -19,7 +19,7 @@ export default function Login() {
     alert(`${name} logged in successfully!`);
 
     // Navigate to Upload page
-    navigate("/upload", { state: { username: name } });
+    navigate("/dashboard");
   };
 
   return (

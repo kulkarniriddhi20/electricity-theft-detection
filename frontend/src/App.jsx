@@ -10,6 +10,9 @@ import Upload from "./pages/Upload";
 import Analytics from "./pages/Analytics";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Dashboard from "./pages/Dashboard";
+import CustomerAnalytics from "./pages/CustomerAnalytics";
+import Alerts from "./pages/Alerts";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -26,9 +29,12 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
             <Route path="/upload" element={<Upload />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/customer-analytics" element={<CustomerAnalytics />} />
+            <Route path="/alerts" element={<Alerts />} />
           </Routes>
         </div>
         <Footer />
